@@ -1,0 +1,20 @@
+version: '3.9'
+services:
+  postgres:
+    container_name: digital-hub-db
+    image: postgres:16.1-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./persist/postgres:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  keydb:
+    container_name: digital-hub-keydb
+    image: eqalpha/keydb:alpine_x86_64_v6.3.4
+    ports:
+      - 6379:6379
+    volumes:
+      - ./persist/keydb:/data
+    command: keydb-server --appendonly yes

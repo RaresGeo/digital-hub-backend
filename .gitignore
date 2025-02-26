@@ -1,0 +1,8 @@
+.env
+Deno.env
+
+deno.lock
+node_modules/
+dist/
+
+persist
