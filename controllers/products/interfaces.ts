@@ -1,4 +1,7 @@
-interface ProductQueryParams {
+import { ProductType } from "../../db/schema.ts";
+
+interface GetProductsQueryParams {
+  productType: ProductType;
   isAdmin: boolean;
   cursor: number;
   limit: number;
@@ -6,8 +9,19 @@ interface ProductQueryParams {
   maxPrice?: number;
   tags?: string[];
   search?: string;
-  sortBy: "price" | "createdAt" | "title";
+  titleSearch?: string;
+  createdAfter?: Date;
+  createdBefore?: Date;
+  updatedAfter?: Date;
+  updatedBefore?: Date;
+  active?: boolean;
+  sortBy: "price" | "createdAt" | "updatedAt" | "title" | "active";
   sortOrder: "asc" | "desc";
 }
 
-export type { ProductQueryParams };
+interface GetProductPathParams {
+  productId: string;
+  [key: string]: string;
+}
+
+export type { GetProductsQueryParams, GetProductPathParams };

@@ -1,0 +1,1 @@
+ALTER TABLE "variant_photos" DROP COLUMN "is_featured";

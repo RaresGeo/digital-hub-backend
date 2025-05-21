@@ -1,10 +1,20 @@
 import { Context } from "../../deps.ts";
 import { OAuth2Client } from "../../deps.ts";
 import { createSessionToken } from "../../utils/jwt.ts";
+import { createLogger } from "../../utils/logger.ts";
 import { getUserInfo } from "./callback.ts";
+
+const moduleLogger = createLogger("AuthRefreshToken");
 
 function refreshTokenHandler(oauth2Client: OAuth2Client) {
   return async (context: Context) => {
+    const requestId = crypto.randomUUID();
+    const logger = moduleLogger.child({
+      requestId,
+      ip: context.request.ip,
+      path: context.request.url.pathname,
+      handler: "refreshTokenHandler",
+    });
     try {
       const refreshToken = await context.cookies.get("refreshToken");
       if (!refreshToken) {
@@ -21,7 +31,7 @@ function refreshTokenHandler(oauth2Client: OAuth2Client) {
         return;
       }
 
-      const userInfo = await getUserInfo(tokens.accessToken);
+      const userInfo = await getUserInfo(tokens.accessToken, logger);
       if (!userInfo?.email || !userInfo?.sub) {
         context.response.status = 401;
         context.response.body = { error: "Invalid user info" };
@@ -50,7 +60,7 @@ function refreshTokenHandler(oauth2Client: OAuth2Client) {
       context.response.status = 200;
       context.response.body = { status: "success" };
     } catch (error) {
-      console.error("[Refresh Token Error]:", error);
+      logger.logError("Error refreshing token", error);
 
       context.cookies.delete("jwt");
       context.cookies.delete("refreshToken");

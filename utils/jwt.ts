@@ -42,8 +42,7 @@ async function verifySessionToken(token: string): Promise<Claims | null> {
     }
 
     return { email: payload.email };
-  } catch (error) {
-    console.error("Failed to verify token", error);
+  } catch {
     return null;
   }
 }

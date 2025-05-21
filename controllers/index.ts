@@ -1,7 +1,7 @@
 import { OAuth2Client, S3Client } from "../deps.ts";
 import { S3FileService } from "../http/file-manager.ts";
-import ProductRepository from "../repository/product.ts";
-import UserRepository from "../repository/user.ts";
+import ProductRepository from "../repository/product.repository.ts";
+import UserRepository from "../repository/user.repository.ts";
 import { AuthController } from "./auth/index.ts";
 import { ProductsController } from "./products/index.ts";
 
@@ -48,6 +48,10 @@ const userRepository = new UserRepository();
 const productRepository = new ProductRepository();
 
 const authController = new AuthController(oauth2Client, userRepository);
-const productsController = new ProductsController(productRepository);
+const productsController = new ProductsController(
+  productRepository,
+  fileService,
+  userRepository
+);
 
 export { authController, productsController };

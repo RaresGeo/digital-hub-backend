@@ -5,7 +5,7 @@ import {
 } from "../../cache/index.ts";
 import { User } from "../../db/schema.ts";
 import { Context, OAuth2Client, Tokens } from "../../deps.ts";
-import UserRepository from "../../repository/user.ts";
+import UserRepository from "../../repository/user.repository.ts";
 import { createSessionToken } from "../../utils/jwt.ts";
 import { Logger, createLogger } from "../../utils/logger.ts";
 
@@ -229,7 +229,9 @@ async function redirectUser(logger: Logger, context: Context, user: User) {
   const opLogger = logger.child({ operation: "redirectUser" });
   opLogger.debug("Redirecting user based on role");
 
-  const state = context.request.url.searchParams.get("state");
+  const url = new URL(context.request.url);
+  const urlParams = url.searchParams;
+  const state = urlParams.get("state");
   const cache = getCache();
   const redirectTo = await cache.get(`${REDIRECT_TO_PREFIX}${state}`);
   if (redirectTo)
@@ -275,7 +277,9 @@ function callbackHandler(
     try {
       logger.info("OAuth callback initiated");
 
-      const state = context.request.url.searchParams.get("state");
+      const url = new URL(context.request.url);
+      const urlParams = url.searchParams;
+      const state = urlParams.get("state");
       const { tokens, errorMessage, statusCode } = await getTokens(
         logger,
         state,

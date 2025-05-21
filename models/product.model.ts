@@ -1,22 +1,37 @@
 import {
+  AnyPgColumn,
   boolean,
   integer,
   jsonb,
+  pgEnum,
   pgTable,
   text,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
 
+export enum ProductType {
+  DigitalPrintable = "DIGITAL_PRINTABLE",
+  WeddingInvitation = "WEDDING_INVITATION",
+}
+
+export const productTypeEnum = pgEnum(
+  "product_type",
+  Object.values(ProductType) as [ProductType, ...ProductType[]]
+);
+
 export const products = pgTable("products", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   thumbnailUrl: text("thumbnail_url").notNull(),
-  isActive: boolean("is_active").notNull().default(true),
-  isDraft: boolean("is_draft").notNull().default(true),
+  thumbnailVariantPhotoId: uuid("thumbnail_variant_photo_id").references(
+    (): AnyPgColumn => variantPhotos.id
+  ),
+  active: boolean("is_active").notNull().default(true),
   metadata: jsonb("metadata").default({}).notNull(),
   tags: text("tags").array(),
+  type: productTypeEnum("type").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -29,10 +44,12 @@ export const productVariants = pgTable("product_variants", {
   productId: uuid("product_id")
     .notNull()
     .references(() => products.id),
-  title: text("title").notNull(), // e.g., "A4 Size", "Letter Size"
+  title: text("title").notNull(),
   price: integer("price").notNull(),
+  digitalAssetFileName: text("digital_asset_file_name").notNull(),
+  digitalAssetSize: integer("digital_asset_size").notNull(),
   digitalAssetUrl: text("digital_asset_url").notNull(),
-  isActive: boolean("is_active").notNull().default(true),
+  active: boolean("is_active").notNull().default(true),
   metadata: jsonb("metadata").default({}).notNull(),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),

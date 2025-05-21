@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --watch --allow-net --env --allow-env --allow-read --allow-write server.ts",
+    "dev": "deno run --watch --allow-net --env --allow-env --allow-read --allow-write --allow-sys=osRelease server.ts",
     "generate": "deno run -A --node-modules-dir npm:drizzle-kit generate --config=db/drizzle.config.ts",
     "migrate": "deno run -A --node-modules-dir npm:drizzle-kit migrate --config=db/drizzle.config.ts"
   },

@@ -20,7 +20,9 @@ function loginHandler(oauth2Client: OAuth2Client) {
       handler: "loginHandler",
     });
 
-    const redirectTo = context.request.url.searchParams.get("redirectTo");
+    const url = new URL(context.request.url);
+    const urlParams = url.searchParams;
+    const redirectTo = urlParams.get("redirectTo");
 
     const { uri, codeVerifier } = await oauth2Client.code.getAuthorizationUri();
     uri.searchParams.set("access_type", "offline");

@@ -3,9 +3,9 @@ import callbackHandler from "./callback.ts";
 import refreshTokenHandler from "./refresh-token.ts";
 import loginHandler from "./login.ts";
 import { AppState } from "../../server.ts";
-import UserRepository from "../../repository/user.ts";
+import UserRepository from "../../repository/user.repository.ts";
 import getProfileHandler from "./profile.ts";
-import authMiddleware from "../../middleware/authMiddleware.ts";
+import { requireAuthMiddlewareFactory } from "../../middleware/authMiddleware.ts";
 import logoutHandler from "./logout.ts";
 import { createLogger, Logger } from "../../utils/logger.ts";
 
@@ -13,7 +13,7 @@ export class AuthController {
   private logger: Logger;
 
   // Middleware
-  private authMiddleware;
+  private requireAuthMiddleware;
 
   // Handlers
   private login;
@@ -30,7 +30,10 @@ export class AuthController {
     this.logger = createLogger("AuthController");
 
     // Middleware
-    this.authMiddleware = authMiddleware(this.userRepository, this.logger);
+    this.requireAuthMiddleware = requireAuthMiddlewareFactory(
+      this.userRepository,
+      this.logger
+    );
 
     // Handlers
     this.login = loginHandler(this.oauth2Client);
@@ -54,10 +57,10 @@ export class AuthController {
     authRouter.post("/refresh-token", this.refreshToken);
     this.logger.debug("Registered POST /auth/refresh-token");
 
-    authRouter.get("/profile", this.authMiddleware, this.getProfile);
+    authRouter.get("/profile", this.requireAuthMiddleware, this.getProfile);
     this.logger.debug("Registered GET /auth/profile (with auth middleware)");
 
-    authRouter.post("/logout", this.authMiddleware, this.logout);
+    authRouter.post("/logout", this.requireAuthMiddleware, this.logout);
     this.logger.debug("Registered POST /auth/logout (with auth middleware)");
 
     router.use("/auth", authRouter.routes(), authRouter.allowedMethods());

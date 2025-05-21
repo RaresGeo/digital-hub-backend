@@ -1,4 +1,14 @@
+declare global {
+  var isArrayBufferView: (object: unknown) => object is ArrayBufferView;
+}
+
+import { isArrayBufferView } from "node:util/types";
+
+// deno-lint-ignore no-explicit-any
+globalThis.isArrayBufferView = isArrayBufferView as any;
+
 export { Application, Router, Context } from "jsr:@oak/oak";
+export type { RouterContext } from "jsr:@oak/oak";
 export { Session } from "https://deno.land/x/oak_sessions@v9.0.0/mod.ts";
 export { OAuth2Client } from "jsr:@cmd-johnson/oauth2-client";
 export { type Tokens } from "jsr:@cmd-johnson/oauth2-client";
